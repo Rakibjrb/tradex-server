@@ -3,6 +3,7 @@ const app = express();
 const handleInternalErrors = require("./utils/serverError");
 const routeNotFound = require("./utils/routeNotFound");
 const defaultMiddlewares = require("./controllers/middleWares/defaultMiddlewares");
+const authRoute = require("./routes/auth/route");
 
 //server default test get route
 app.get("/", (req, res) => {
@@ -14,6 +15,9 @@ app.get("/", (req, res) => {
 
 //used some default and installed middlewares
 defaultMiddlewares(express, app);
+
+//authentication routes and user related routes
+app.use(authRoute);
 
 //route not found handler
 app.all("*", routeNotFound);
