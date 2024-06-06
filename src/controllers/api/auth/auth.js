@@ -15,6 +15,13 @@ const addUser = async (req, res, next) => {
       verifyed: false,
     };
 
+    const foundEmail = await Users.findOne({ email: userInfo.email });
+    if (foundEmail) {
+      const emailFoundError = new Error("Email has been already registered");
+      emailFoundError.status = 404;
+      return next(emailFoundError);
+    }
+
     const saveUser = await Users.create(data);
 
     res.send(
