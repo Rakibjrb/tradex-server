@@ -14,6 +14,12 @@ const addUser = async (req, res, next) => {
       username: generateUserName(userInfo.fullname),
       balance: 0,
       verified: false,
+      auth: {
+        loginToken: generateHash({
+          name: userInfo.fullname,
+          email: userInfo.email,
+        }),
+      },
     };
 
     const foundEmail = await Users.findOne({ email: userInfo.email });
@@ -37,6 +43,7 @@ const userLogin = async (req, res, next) => {
   try {
     const data = req.body;
     const isUser = await Users.findOne({ email: data.email }, "password");
+
     if (!isUser) {
       const error = new Error("User not found on this email");
       error.status = 403;
@@ -49,14 +56,11 @@ const userLogin = async (req, res, next) => {
       return next(error);
     }
 
-    const userInfo = await Users.findOne(
-      { email: data.email },
-      "fullname username email phone verified balance"
-    );
+    const cookieInfo = await Users.findOne({ email: data.email }, "auth");
+    const loginToken = cookieInfo?.auth?.loginToken;
 
-    res.send({
+    res.cookie("loginToken", loginToken).send({
       message: "success",
-      userInfo,
     });
   } catch (error) {
     next(error);
