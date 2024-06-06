@@ -2,6 +2,7 @@ const Users = require("../../../models/users/user");
 const {
   generateHash,
   generateUserName,
+  checkLoginPassword,
 } = require("../../../utils/passwordManager");
 
 const addUser = async (req, res, next) => {
@@ -12,7 +13,7 @@ const addUser = async (req, res, next) => {
       password: generateHash(userInfo.password),
       username: generateUserName(userInfo.fullname),
       balance: 0,
-      verifyed: false,
+      verified: false,
     };
 
     const foundEmail = await Users.findOne({ email: userInfo.email });
@@ -32,4 +33,34 @@ const addUser = async (req, res, next) => {
   }
 };
 
-module.exports = { addUser };
+const userLogin = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const isUser = await Users.findOne({ email: data.email }, "password");
+    if (!isUser) {
+      const error = new Error("User not found on this email");
+      error.status = 403;
+      return next(error);
+    }
+
+    if (!checkLoginPassword(isUser.password, data.password)) {
+      const error = new Error("Invalid password");
+      error.status = 403;
+      return next(error);
+    }
+
+    const userInfo = await Users.findOne(
+      { email: data.email },
+      "fullname username email phone verified balance"
+    );
+
+    res.send({
+      message: "success",
+      userInfo,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { addUser, userLogin };

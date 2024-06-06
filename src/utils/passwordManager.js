@@ -6,6 +6,11 @@ const generateHash = (password) => {
   return hash;
 };
 
+const checkLoginPassword = (token, enteredPass) => {
+  const cheked = jwt.verify(token, process.env.User_secrete) === enteredPass;
+  return cheked;
+};
+
 const generateUserName = (fullname) => {
   const name = fullname.toLowerCase().replace(" ", "_");
   const username =
@@ -16,4 +21,4 @@ const generateUserName = (fullname) => {
   return username;
 };
 
-module.exports = { generateHash, generateUserName };
+module.exports = { generateHash, generateUserName, checkLoginPassword };

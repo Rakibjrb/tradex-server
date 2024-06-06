@@ -8,7 +8,7 @@ const userSchema = new Schema(
     phone: { type: String, required: true },
     password: { type: String, required: true },
     balance: { type: Number },
-    verifyed: { type: Boolean },
+    verified: { type: Boolean },
   },
   { timestamps: true }
 );
