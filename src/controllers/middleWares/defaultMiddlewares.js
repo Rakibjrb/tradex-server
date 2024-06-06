@@ -5,7 +5,7 @@ const defaultMiddlewares = (express, app) => {
   app.use(express.json());
   app.use(
     cors({
-      origin: [process.env.origin],
+      origin: [process.env.Origin],
       credentials: true,
     })
   );
