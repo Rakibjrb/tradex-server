@@ -59,9 +59,15 @@ const userLogin = async (req, res, next) => {
     const cookieInfo = await Users.findOne({ email: data.email }, "auth");
     const loginToken = cookieInfo?.auth?.loginToken;
 
-    res.cookie("loginToken", loginToken).send({
-      message: "success",
-    });
+    res
+      .cookie("loginToken", loginToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+      })
+      .send({
+        message: "success",
+      });
   } catch (error) {
     next(error);
   }
