@@ -3,6 +3,7 @@ const {
   generateHash,
   generateUserName,
   checkLoginPassword,
+  createToken,
 } = require("../../../utils/passwordManager");
 
 const addUser = async (req, res, next) => {
@@ -14,12 +15,6 @@ const addUser = async (req, res, next) => {
       username: generateUserName(userInfo.fullname),
       balance: 0,
       verified: false,
-      auth: {
-        loginToken: generateHash({
-          name: userInfo.fullname,
-          email: userInfo.email,
-        }),
-      },
     };
 
     const foundEmail = await Users.findOne({ email: userInfo.email });
@@ -56,18 +51,23 @@ const userLogin = async (req, res, next) => {
       return next(error);
     }
 
-    const cookieInfo = await Users.findOne({ email: data.email }, "auth");
-    const loginToken = cookieInfo?.auth?.loginToken;
+    const correctUser = await Users.findOne(
+      { email: data.email },
+      "username email"
+    );
+
+    const token = createToken({
+      email: correctUser.email,
+      username: correctUser.username,
+    });
 
     res
-      .cookie("loginToken", loginToken, {
-        httpOnly: true,
+      .cookie("token", token, {
         secure: true,
-        sameSite: "None",
+        sameSite: "Strict",
+        httpOnly: true,
       })
-      .send({
-        message: "success",
-      });
+      .send("Success");
   } catch (error) {
     next(error);
   }

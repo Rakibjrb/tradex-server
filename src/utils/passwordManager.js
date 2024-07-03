@@ -21,4 +21,13 @@ const generateUserName = (fullname) => {
   return username;
 };
 
-module.exports = { generateHash, generateUserName, checkLoginPassword };
+const createToken = (info) => {
+  return jwt.sign(info, process.env.User_secrete, { expiresIn: "1h" });
+};
+
+module.exports = {
+  generateHash,
+  generateUserName,
+  checkLoginPassword,
+  createToken,
+};
